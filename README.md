@@ -11,7 +11,7 @@ A problem with this is that there is a limit on how many things you can do with 
 - Then install pip3
 - Using pip, install the googleapi, spotipy, sys and json
 - then create a google api account.
-- Finally, put your credentials in all three files where there will be variables with `<INSERT HERE>` that you will have to replace.
+- Finally, put your credentials in all three files where there will be variables with `<INSERT>` that you will have to replace.
   - [Here](api.py)
 
 ## How to get into the developer's console
