@@ -64,6 +64,28 @@ def make_playlist(name: str, yt):
     return response
 
 
+def add_song(playlistId: str, songId: str, yt):
+    if (yt == None):
+        yt = get_yt_cred()
+
+    request = yt.playlistItems().insert(
+        part="snippet",
+        body={
+            "snippet": {
+                "playlistId": playlistId,
+                "position": 0,
+                "resourceId": {
+                    "kind": "youtube#video",
+                    "videoId": songId
+                }
+            }
+        }
+    )
+    response = request.execute()
+
+    return response
+
+
 def get_spotify_playlist(link: str):
 
     if (not link.startswith('https://')):
