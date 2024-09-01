@@ -54,5 +54,41 @@ def main():
         save_object["state"] = 1
         save_file()
 
+    if (save_object["state"] < 2):
+        try:
+            playlist_response = make_playlist(playlist_name, yt)
+            print(json.dumps(playlist_response, indent=3))
+            save_object["playlist_id"] = playlist_response["id"]
+            save_object["state"] = 2
+            save_file()
+        except Exception as err:
+            print(type(err))
+            print(err.args)
+            print(err)
+            sys.exit()
+
+    error_count = 0
+    while len(save_object["yt_ids"]) != 0:
+        song_id = save_object["yt_ids"].pop()
+        try:
+            print(song_id)
+            add_song(save_object["playlist_id"], song_id, yt)
+        except Exception as err:
+            save_object["yt_ids"].append(song_id)
+            save_object["state"] = 2
+            save_file()
+            error_count += 1
+            if (error_count > 10):
+                sys.exit()
+    save_object["state"] = -1
+    save_file()
+
+
+def save_file():
+    global save_object
+    with open("save.json", "w") as out_file:
+        out_file.write(json.dumps(save_object, indent=4))
+
+
 if __name__ == "__main__":
     main()
