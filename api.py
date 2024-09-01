@@ -1,5 +1,9 @@
-
+import json
+import requests
 from googleapiclient.discovery import build
+import spotipy
+from spotipy.oauth2 import SpotifyOAuth, SpotifyClientCredentials
+import google.oauth2.credentials
 import google_auth_oauthlib.flow
 import os
 import google_auth_oauthlib.flow
@@ -58,3 +62,41 @@ def make_playlist(name: str, yt):
     response = request.execute()
 
     return response
+
+
+def get_spotify_playlist(link: str):
+
+    if (not link.startswith('https://')):
+        print("Invalid Link")
+
+    if (link.find("?") != -1):
+        link = link.removesuffix(link[link.find("?"): len(link)])
+        print("trunkated link to: ", link)
+    while link.find("/") != -1:
+        link = link.removeprefix(link[0: link.find("/") + 1])
+        print("trunkated link to: ", link)
+
+    client_credentials_manager = SpotifyClientCredentials(
+        client_id=SPOTIFY_CLIENT_ID, client_secret=SPOTIFY_KEY)
+    sp = spotipy.Spotify(client_credentials_manager=client_credentials_manager)
+    print("got spotify manager")
+
+    full_list = []
+    playlist = sp.playlist_items(link)
+    offset = 0
+    
+    print("running through: ", playlist, " with offset:", offset)
+    for i in range(len(playlist["items"])):
+        full_list.append(playlist["items"][i])
+    offset += 100
+    playlist = sp.playlist_items(link, offset=offset)
+    
+    while playlist['offset'] == playlist['total']:
+        
+        print("running through: ", playlist, " with offset:", offset)
+        for i in range(len(playlist["items"])):
+            full_list.append(playlist["items"][i])
+        offset += 100
+        playlist = sp.playlist_items(link, offset=offset)
+        
+    return full_list
